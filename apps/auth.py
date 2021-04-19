@@ -3,13 +3,14 @@ import os
 from authlib.integrations.starlette_client import OAuth
 from authlib.integrations.starlette_client import OAuthError
 from fastapi import FastAPI
-from fastapi import HTTPException
 from fastapi import Request
-from fastapi import status
 from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import JSONResponse
 
+from apps.jwt import create_token
+from apps.jwt import CREDENTIALS_EXCEPTION
+from apps.jwt import valid_email_from_db
 # Create the auth app
 auth_app = FastAPI()
 
@@ -35,10 +36,13 @@ if SECRET_KEY is None:
     raise 'Missing SECRET_KEY'
 auth_app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
+# Frontend URL:
+FRONTEND_URL = os.environ.get('FRONTEND_URL') or 'http://127.0.0.1:7000/token'
+
 
 @auth_app.route('/login')
 async def login(request: Request):
-    redirect_uri = request.url_for('auth')  # This creates the url for our /auth endpoint
+    redirect_uri = FRONTEND_URL  # This creates the url for our /auth endpoint
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
@@ -47,12 +51,8 @@ async def auth(request: Request):
     try:
         access_token = await oauth.google.authorize_access_token(request)
     except OAuthError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Could not validate credentials',
-            headers={'WWW-Authenticate': 'Bearer'},
-        )
+        raise CREDENTIALS_EXCEPTION
     user_data = await oauth.google.parse_id_token(request, access_token)
-    # TODO: validate email in our database and generate JWT token
-    # TODO: return the JWT token to the user so it can make requests to our /api endpoint
-    return JSONResponse(dict(user_data))
+    if valid_email_from_db(user_data['email']):
+        return JSONResponse({'result': True, 'access_token': create_token(user_data['email'])})
+    raise CREDENTIALS_EXCEPTION
