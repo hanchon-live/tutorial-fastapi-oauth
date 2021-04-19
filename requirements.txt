@@ -11,6 +11,7 @@ idna==3.1
 itsdangerous==1.1.0
 pycparser==2.20
 pydantic==1.8.1
+PyJWT==2.0.1
 rfc3986==1.4.0
 sniffio==1.2.0
 starlette==0.13.6
