@@ -13,7 +13,7 @@ app.mount('/api', api_app)
 
 @app.get('/')
 async def root():
-    return HTMLResponse('<body><a href="/auth/login">Log In</button></body>')
+    return HTMLResponse('<body><a href="/auth/login">Log In</a></body>')
 
 
 @app.get('/token')
