@@ -37,7 +37,7 @@ async def token(request: Request):
 
                 }
                 </script>
-                <button onClick="send()">Get FastAPI JTW Token</button>
+                <button onClick="send()">Get FastAPI JWT Token</button>
 
                 <button onClick='fetch("http://127.0.0.1:7000/api/").then(
                     (r)=>r.json()).then((msg)=>{console.log(msg)});'>
