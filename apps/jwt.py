@@ -8,6 +8,8 @@ from fastapi import HTTPException
 from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
 
+from apps.db import is_token_blacklisted
+
 # Create a fake db:
 FAKE_DB = {'guillermo.paoletti@gmail.com': {'name': 'Guillermo Paoletti'}}
 
@@ -65,6 +67,8 @@ def valid_email_from_db(email):
 
 
 async def get_current_user_email(token: str = Depends(oauth2_scheme)):
+    if is_token_blacklisted(token):
+        raise CREDENTIALS_EXCEPTION
     try:
         payload = jwt.decode(token, API_SECRET_KEY, algorithms=[API_ALGORITHM])
         email: str = payload.get('sub')
@@ -77,3 +81,8 @@ async def get_current_user_email(token: str = Depends(oauth2_scheme)):
         return email
 
     raise CREDENTIALS_EXCEPTION
+
+
+async def get_current_user_token(token: str = Depends(oauth2_scheme)):
+    _ = await get_current_user_email(token)
+    return token
