@@ -31,6 +31,7 @@ if API_SECRET_KEY is None:
     raise BaseException('Missing API_SECRET_KEY env var.')
 API_ALGORITHM = os.environ.get('API_ALGORITHM') or 'HS256'
 API_ACCESS_TOKEN_EXPIRE_MINUTES = cast_to_number('API_ACCESS_TOKEN_EXPIRE_MINUTES') or 15
+REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 30
 
 # Token url (We should later create a token url that accepts just a user and a password to use swagger)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/token')
@@ -55,6 +56,11 @@ def create_access_token(*, data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
+def create_refresh_token(email):
+    expires = timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
+    return create_access_token(data={'sub': email}, expires_delta=expires)
+
+
 # Create token for an email
 def create_token(email):
     access_token_expires = timedelta(minutes=API_ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -66,11 +72,15 @@ def valid_email_from_db(email):
     return email in FAKE_DB
 
 
+def decode_token(token):
+    return jwt.decode(token, API_SECRET_KEY, algorithms=[API_ALGORITHM])
+
+
 async def get_current_user_email(token: str = Depends(oauth2_scheme)):
     if is_token_blacklisted(token):
         raise CREDENTIALS_EXCEPTION
     try:
-        payload = jwt.decode(token, API_SECRET_KEY, algorithms=[API_ALGORITHM])
+        payload = decode_token(token)
         email: str = payload.get('sub')
         if email is None:
             raise CREDENTIALS_EXCEPTION

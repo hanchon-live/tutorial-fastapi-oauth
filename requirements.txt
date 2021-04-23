@@ -12,6 +12,7 @@ itsdangerous==1.1.0
 pycparser==2.20
 pydantic==1.8.1
 PyJWT==2.0.1
+python-multipart==0.0.5
 rfc3986==1.4.0
 sniffio==1.2.0
 starlette==0.13.6

@@ -41,6 +41,7 @@ async def token(request: Request):
                             console.log(req.response);
                             if (req.response["result"] === true) {
                                 window.localStorage.setItem('jwt', req.response["access_token"]);
+                                window.localStorage.setItem('refresh', req.response["refresh_token"]);
                             }
                         }
                     }
@@ -81,6 +82,25 @@ async def token(request: Request):
                     });'>
                 Logout
                 </button>
+
+                <button onClick='fetch("http://127.0.0.1:7000/auth/refresh",{
+                    method: "POST",
+                    headers:{
+                        "Authorization": "Bearer " + window.localStorage.getItem("jwt")
+                    },
+                    body:JSON.stringify({
+                        grant_type:\"refresh_token\",
+                        refresh_token:window.localStorage.getItem(\"refresh\")
+                        })
+                }).then((r)=>r.json()).then((msg)=>{
+                    console.log(msg);
+                    if (msg["result"] === true) {
+                        window.localStorage.setItem("jwt", msg["access_token"]);
+                    }
+                    });'>
+                Refresh
+                </button>
+
             ''')
 
 
