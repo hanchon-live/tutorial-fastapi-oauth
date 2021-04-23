@@ -1,8 +1,8 @@
 # FastAPI and Google Login (OAuth)
 This is an example following the tutorials:
-- https://blog.hanchon.live/guides/google-login-with-fastapi/
-- https://blog.hanchon.live/guides/jwt-tokens-and-fastapi/
-- https://blog.hanchon.live/guides/jwt-tokens-and-fastapi/
+- [Guide 1 - Google OAuth Login with FastAPI](https://blog.hanchon.live/guides/google-login-with-fastapi/)
+- [Guide 2 - Google OAuth and FastAPI JWT](https://blog.hanchon.live/guides/google-login-with-fastapi-and-jwt/)
+- [Guide 3 - JWT blacklist and refresh tokens](https://blog.hanchon.live/guides/jwt-tokens-and-fastapi/)
 
 ## Requirements:
 - Python3.6+
